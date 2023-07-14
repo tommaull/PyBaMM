@@ -10,10 +10,13 @@ class ThermalParameters(BaseParameters):
     Standard thermal parameters
     """
 
-    def __init__(self):
+    def __init__(self, options=None):
+        self.options = options
+
         # Get geometric parameters
         self.geo = pybamm.geometric_parameters
 
+        # Set domain attribute
         self.n = DomainThermalParameters("negative", self)
         self.s = DomainThermalParameters("separator", self)
         self.p = DomainThermalParameters("positive", self)
@@ -28,8 +31,9 @@ class ThermalParameters(BaseParameters):
 
     def _set_parameters(self):
         """Defines the dimensional parameters"""
-        for domain in self.domain_params.values():
-            domain._set_parameters()
+        for domain, params in self.domain_params.items():
+            params._domain = domain  # Set _domain attribute
+            params._set_parameters()
 
         # Reference temperature
         self.T_ref = pybamm.Parameter("Reference temperature [K]")
@@ -38,8 +42,25 @@ class ThermalParameters(BaseParameters):
         self.h_edge = pybamm.Parameter("Edge heat transfer coefficient [W.m-2.K-1]")
         self.h_total = pybamm.Parameter("Total heat transfer coefficient [W.m-2.K-1]")
 
+        x = pybamm.SpatialVariable(
+            f"x_{domain[0]}",
+            domain=[f"{domain} electrode"],
+            auxiliary_domains={"secondary": "current collector"},
+            coord_sys="cartesian",
+        )
+        # Domain parameters
+        for domain in self.domain_params.values():
+            domain._set_parameters()
+
         # Initial temperature
-        self.T_init = pybamm.Parameter("Initial temperature [K]")
+        self.T_init = pybamm.FunctionParameter(
+            f"{domain}Initial temperature in {domain} electrode [mol.m-3]",
+            {
+                "Through-cell distance (x) [m]": pybamm.PrimaryBroadcast(
+                    x, f"{domain} particle"
+                ),
+            },
+        )
 
     def T_amb(self, t):
         """Dimensional ambient temperature"""
