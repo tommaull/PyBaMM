@@ -53,13 +53,18 @@ class ThermalParameters(BaseParameters):
             domain._set_parameters()
 
         # Initial temperature
+        # self.T_init = pybamm.FunctionParameter(
+        #   f"{domain}Initial temperature in {domain} electrode [mol.m-3]",
+        #  {
+        #     "Through-cell distance (x) [m]": pybamm.PrimaryBroadcast(
+        #        x, f"{domain} electrode"
+        #   ),
+        #   },
+        # )
+
         self.T_init = pybamm.FunctionParameter(
             f"{domain}Initial temperature in {domain} electrode [mol.m-3]",
-            {
-                "Through-cell distance (x) [m]": pybamm.PrimaryBroadcast(
-                    x, f"{domain} particle"
-                ),
-            },
+            {"Through-cell distance (x) [m]": x},
         )
 
     def T_amb(self, t):

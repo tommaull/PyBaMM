@@ -20,8 +20,8 @@ class Lumped(BaseThermal):
 
     """
 
-    def __init__(self, param, options=None):
-        super().__init__(param, options=options)
+    def __init__(self, param, domain, options=None):
+        super().__init__(param, domain, options=options)
         pybamm.citations.register("Timms2021")
 
     def get_fundamental_variables(self):
@@ -99,6 +99,6 @@ class Lumped(BaseThermal):
             / self.param.rho_c_p_eff(T_vol_av)
         }
 
-    def set_initial_conditions(self, variables):
+    def set_initial_conditions(self, variables, x):
         T_vol_av = variables["Volume-averaged cell temperature [K]"]
-        self.initial_conditions = {T_vol_av: self.param.T_init}
+        self.initial_conditions = {T_vol_av: pybamm.x_average(self.param.T_init(x))}
