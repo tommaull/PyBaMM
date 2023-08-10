@@ -18,9 +18,8 @@ class BaseThermal(pybamm.BaseSubModel):
         A dictionary of options to be passed to the model.
     """
 
-    def __init__(self, param, domain, options=None):
+    def __init__(self, param, options=None):
         super().__init__(param, options=options)
-        self.domain = domain
 
     def _get_standard_fundamental_variables(self, T_dict):
         """
