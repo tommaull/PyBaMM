@@ -49,8 +49,8 @@ class ThermalParameters(BaseParameters):
             coord_sys="cartesian",
         )
         # Domain parameters
-        for domain in self.domain_params.values():
-            domain._set_parameters()
+        for domainValues in self.domain_params.values():
+            domainValues._set_parameters()
 
         # Initial temperature
         # self.T_init = pybamm.FunctionParameter(
