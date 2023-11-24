@@ -12,8 +12,6 @@ class BaseThermal(pybamm.BaseSubModel):
     ----------
     param : parameter class
         The parameters to use for this submodel
-    domain : str
-        The domain of the submodel (e.g., "negative electrode")
     options : dict, optional
         A dictionary of options to be passed to the model.
     """
