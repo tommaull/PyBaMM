@@ -1,4 +1,4 @@
-Install from source (developer install)
+Install from source (GNU Linux and macOS)
 =========================================
 
 .. contents::
@@ -42,16 +42,16 @@ You can install the above with
 
 	Where ``X`` is the version sub-number.
 
+	.. note::
+
+		On Windows, you can install ``graphviz`` using the `Chocolatey <https://chocolatey.org/>`_ package manager, or
+		follow the instructions on the `graphviz website <https://graphviz.org/download/>`_.
+
 .. tab:: MacOS
 
 	.. code:: bash
 
 		brew install python openblas gcc gfortran graphviz libomp
-
-.. note::
-
-	On Windows, you can install ``graphviz`` using the `Chocolatey <https://chocolatey.org/>`_ package manager, or
-	follow the instructions on the `graphviz website <https://graphviz.org/download/>`_.
 
 Finally, we recommend using `Nox <https://nox.thea.codes/en/stable/>`_.
 You can install it with
@@ -105,8 +105,8 @@ Installing PyBaMM
 
 You should now have everything ready to build and install PyBaMM successfully.
 
-Using Nox (recommended)
-~~~~~~~~~~~~~~~~~~~~~~~
+Using ``Nox`` (recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
@@ -114,9 +114,9 @@ Using Nox (recommended)
 	nox -s dev
 
 .. note::
-    It is recommended to use ``--verbose`` or ``-v`` to see outputs of all commands run.
+	It is recommended to use ``--verbose`` or ``-v`` to see outputs of all commands run.
 
-This creates a virtual environment ``.nox/dev`` inside the ``PyBaMM/`` directory.
+This creates a virtual environment ``venv/`` inside the ``PyBaMM/`` directory.
 It comes ready with PyBaMM and some useful development tools like `pre-commit <https://pre-commit.com/>`_ and `ruff <https://beta.ruff.rs/docs/>`_.
 
 You can now activate the environment with
@@ -125,13 +125,13 @@ You can now activate the environment with
 
 	.. code:: bash
 
-		source .nox/dev/bin/activate
+		source venv/bin/activate
 
 .. tab:: Windows
 
 	.. code:: bash
 
-	  	.nox\dev\Scripts\activate.bat
+		venv\Scripts\activate.bat
 
 and run the tests to check your installation.
 
@@ -158,13 +158,16 @@ If you are using ``zsh``, you would need to use different pattern matching:
 
 	  pip install -e '.[all,dev,docs]'
 
+Before you start contributing to PyBaMM, please read the `contributing
+guidelines <https://github.com/pybamm-team/PyBaMM/blob/develop/CONTRIBUTING.md>`__.
+
 Running the tests
 -----------------
 
 Using Nox (recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use Nox to run the unit tests and example notebooks in isolated virtual environments.
+You can use ``Nox`` to run the unit tests and example notebooks in isolated virtual environments.
 
 The default command
 
@@ -172,7 +175,7 @@ The default command
 
 	nox
 
-will run pre-commit, install ``Linux`` dependencies, and run the unit tests.
+will run pre-commit, install ``Linux`` and ``macOS`` dependencies, and run the unit tests.
 This can take several minutes.
 
 To just run the unit tests, use
@@ -237,13 +240,15 @@ Doctests, examples, and coverage
 ``Nox`` can also be used to run doctests, run examples, and generate a coverage report using:
 
 - ``nox -s examples``: Run the Jupyter notebooks in ``docs/source/examples/notebooks/``.
+- ``nox -s examples -- <path-to-notebook-1.ipynb> <path-to_notebook-2.ipynb>``: Run specific Jupyter notebooks.
 - ``nox -s scripts``: Run the example scripts in ``examples/scripts/``.
 - ``nox -s doctests``: Run doctests.
 - ``nox -s coverage``: Measure current test coverage and generate a coverage report.
 - ``nox -s quick``: Run integration tests, unit tests, and doctests sequentially.
 
-Extra tips while using Nox
---------------------------
+Extra tips while using ``Nox``
+------------------------------
+
 Here are some additional useful commands you can run with ``Nox``:
 
 - ``--verbose or -v``: Enables verbose mode, providing more detailed output during the execution of Nox sessions.
@@ -253,3 +258,41 @@ Here are some additional useful commands you can run with ``Nox``:
 - ``--install-only``: Skips the test execution and only performs the installation step defined in the Nox sessions.
 - ``--nocolor``: Disables the color output in the console during the execution of Nox sessions.
 - ``--report output.json``: Generates a JSON report of the Nox session execution and saves it to the specified file, in this case, "output.json".
+- ``nox -s docs --non-interactive``: Builds the documentation without serving it locally (using ``sphinx-build`` instead of ``sphinx-autobuild``).
+
+Troubleshooting
+---------------
+
+**Problem:** I have made edits to source files in PyBaMM, but these are
+not being used when I run my Python script.
+
+**Solution:** Make sure you have installed PyBaMM using the ``-e`` flag,
+i.e. ``pip install -e .``. This sets the installed location of the
+source files to your current directory.
+
+**Problem:** Errors when solving model
+``ValueError: Integrator name ida does not exist``, or
+``ValueError: Integrator name cvode does not exist``.
+
+**Solution:** This could mean that you have not installed
+``scikits.odes`` correctly, check the instructions given above and make
+sure each command was successful.
+
+One possibility is that you have not set your ``LD_LIBRARY_PATH`` to
+point to the sundials library, type ``echo $LD_LIBRARY_PATH`` and make
+sure one of the directories printed out corresponds to where the
+SUNDIALS libraries are located.
+
+Another common reason is that you forget to install a BLAS library such
+as OpenBLAS before installing SUNDIALS. Check the cmake output when you
+configured SUNDIALS, it might say:
+
+::
+
+   -- A library with BLAS API not found. Please specify library location.
+   -- LAPACK requires BLAS
+
+If this is the case, on a Debian or Ubuntu system you can install
+OpenBLAS using ``sudo apt-get install libopenblas-dev`` (or
+``brew install openblas`` for Mac OS) and then re-install SUNDIALS using
+the instructions above.

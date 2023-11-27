@@ -5,10 +5,10 @@ from tests import TestCase
 import unittest
 
 import numpy as np
-import sympy
 from scipy.sparse import coo_matrix
 
 import pybamm
+from pybamm.util import have_optional_dependency
 
 
 class TestBinaryOperators(TestCase):
@@ -323,6 +323,12 @@ class TestBinaryOperators(TestCase):
         # simplifications
         self.assertEqual(1 < b + 2, -1 < b)
         self.assertEqual(b + 1 > 2, b > 1)
+
+        # expression with a subtract
+        expr = 2 * (b < 1) - (b > 3)
+        self.assertEqual(expr.evaluate(y=np.array([0])), 2)
+        self.assertEqual(expr.evaluate(y=np.array([2])), 0)
+        self.assertEqual(expr.evaluate(y=np.array([4])), -1)
 
     def test_equality(self):
         a = pybamm.Scalar(1)
@@ -740,6 +746,7 @@ class TestBinaryOperators(TestCase):
         self.assertEqual(pybamm.inner(a3, a3).evaluate(), 9)
 
     def test_to_equation(self):
+        sympy = have_optional_dependency("sympy")
         # Test print_name
         pybamm.Addition.print_name = "test"
         self.assertEqual(pybamm.Addition(1, 2).to_equation(), sympy.Symbol("test"))
