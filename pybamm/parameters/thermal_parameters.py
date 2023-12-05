@@ -31,9 +31,12 @@ class ThermalParameters(BaseParameters):
 
     def _set_parameters(self):
         """Defines the dimensional parameters"""
-        for domain, params in self.domain_params.items():
-            #params._domain = domain  # Set _domain attribute
-            params._set_parameters()
+        for domain in self.domain_params.values():
+            domain._set_parameters()
+
+       # for domain, params in self.domain_params.items():
+        #    #params._domain = domain  # Set _domain attribute
+        #    params._set_parameters()
 
         # Reference temperature
         self.T_ref = pybamm.Parameter("Reference temperature [K]")
